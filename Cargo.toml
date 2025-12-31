@@ -5,7 +5,8 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.100"
-calloop = "0.14.3"
+calloop = { version = "0.14.3", features = ["signals"] }
 evdev = "0.13.2"
 tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
 zbus = "5.12.0"
