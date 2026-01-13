@@ -1,8 +1,9 @@
+use crate::dbus_listener::EventHandle;
 use crate::dbus_listener::Start;
 use crate::event_handler::Event;
-use crate::event_handler::remote_desktop::*;
 use anyhow::Context;
 use calloop::channel;
+use futures::channel::oneshot;
 use std::collections::HashMap;
 use tracing::debug;
 use zbus::blocking::Connection;
@@ -10,78 +11,107 @@ use zbus::blocking::connection::Builder;
 use zbus::interface;
 use zbus::zvariant;
 
-pub(crate) struct RemoteDesktopListener {
-    sender: channel::Sender<Event>,
+pub struct RemoteDesktopListener {
+    sender: channel::Sender<EventHandle>,
 }
 
 impl RemoteDesktopListener {
-    pub fn new(sender: channel::Sender<Event>) -> Self {
+    pub fn new(sender: channel::Sender<EventHandle>) -> Self {
         Self { sender }
     }
 }
 
 #[interface(name = "org.freedesktop.impl.portal.RemoteDesktop")]
 impl RemoteDesktopListener {
-    pub fn create_session(
+    async fn create_session(
         &self,
         handle: zvariant::ObjectPath<'_>,
         session_handle: zvariant::ObjectPath<'_>,
         app_id: String,
         options: HashMap<String, zvariant::OwnedValue>,
-    ) -> (u32, HashMap<String, zvariant::OwnedValue>) {
-        let _ = self
-            .sender
-            .send(Event::RemoteDesktop(RemoteDesktopEvent::CreateSession(
-                CreateSession {
-                    handle: handle.into_owned(),
-                    session_handle: session_handle.into_owned(),
-                    app_id,
-                    options,
-                },
-            )));
-        (0, HashMap::new())
+    ) -> zvariant::OwnedValue {
+        // let event = Event::RemoteDesktop(RemoteDesktopEvent::CreateSession(CreateSession {
+        //     handle: handle.into_owned(),
+        //     session_handle: session_handle.into_owned(),
+        //     app_id,
+        //     options,
+        // }));
+
+        // debug!(
+        //     "Interface called [RemoteDesktop.CreateSession] {:#?}",
+        //     event
+        // );
+
+        // let (tx, rx) = oneshot::channel::<zvariant::OwnedValue>();
+
+        // self.sender.send((event, tx));
+
+        // match rx.await {
+        //     Ok(value) => value,
+        //     Err(_) => zvariant::OwnedValue::from(2),
+        // }
+        zvariant::OwnedValue::from(0)
     }
 
-    pub fn select_devices(
+    async fn select_devices(
         &self,
         handle: zvariant::ObjectPath<'_>,
         session_handle: zvariant::ObjectPath<'_>,
         app_id: String,
         options: HashMap<String, zvariant::OwnedValue>,
-    ) -> (u32, HashMap<String, zvariant::OwnedValue>) {
-        let _ = self
-            .sender
-            .send(Event::RemoteDesktop(RemoteDesktopEvent::SelectDevices(
-                SelectDevices {
-                    handle: handle.into_owned(),
-                    session_handle: session_handle.into_owned(),
-                    app_id,
-                    options,
-                },
-            )));
-        (0, HashMap::new())
+    ) -> zvariant::OwnedValue {
+        // let event = Event::RemoteDesktop(RemoteDesktopEvent::SelectDevices(SelectDevices {
+        //     handle: handle.into_owned(),
+        //     session_handle: session_handle.into_owned(),
+        //     app_id,
+        //     options,
+        // }));
+
+        // debug!(
+        //     "Interface called [RemoteDesktop.SelectDevices] {:#?}",
+        //     event
+        // );
+
+        // let (tx, rx) = oneshot::channel::<zvariant::OwnedValue>();
+
+        // self.sender.send((event, tx));
+
+        // match rx.await {
+        //     Ok(value) => value,
+        //     Err(_) => zvariant::OwnedValue::from(2),
+        // }
+        zvariant::OwnedValue::from(0)
     }
 
-    pub fn start(
+    async fn start(
         &self,
         handle: zvariant::ObjectPath<'_>,
         session_handle: zvariant::ObjectPath<'_>,
         app_id: String,
         parent_window: String,
         options: HashMap<String, zvariant::OwnedValue>,
-    ) -> (u32, HashMap<String, zvariant::OwnedValue>) {
-        let _ = self
-            .sender
-            .send(Event::RemoteDesktop(RemoteDesktopEvent::Start(
-                crate::event_handler::remote_desktop::Start {
-                    handle: handle.into_owned(),
-                    session_handle: session_handle.into_owned(),
-                    app_id,
-                    parent_window,
-                    options,
-                },
-            )));
-        (0, HashMap::new())
+    ) -> zvariant::OwnedValue {
+        // let event = Event::RemoteDesktop(RemoteDesktopEvent::Start(
+        //     crate::event_handler::remote_desktop::Start {
+        //         handle: handle.into_owned(),
+        //         session_handle: session_handle.into_owned(),
+        //         app_id,
+        //         parent_window,
+        //         options,
+        //     },
+        // ));
+
+        // debug!("Interface called [RemoteDesktop.Start] {:#?}", event);
+
+        // let (tx, rx) = oneshot::channel::<zvariant::OwnedValue>();
+
+        // self.sender.send((event, tx));
+
+        // match rx.await {
+        //     Ok(value) => value,
+        //     Err(_) => zvariant::OwnedValue::from(2),
+        // }
+        zvariant::OwnedValue::from(0)
     }
 
     pub fn notify_pointer_motion(
@@ -91,14 +121,23 @@ impl RemoteDesktopListener {
         dx: f64,
         dy: f64,
     ) {
-        let _ = self.sender.send(Event::RemoteDesktop(
-            RemoteDesktopEvent::NotifyPointerMotion(NotifyPointerMotion {
-                session_handle: session_handle.into_owned(),
-                options,
-                dx,
-                dy,
-            }),
-        ));
+        // let event = Event::RemoteDesktop(RemoteDesktopEvent::NotifyPointerMotion(
+        //     NotifyPointerMotion {
+        //         session_handle: session_handle.into_owned(),
+        //         options,
+        //         dx,
+        //         dy,
+        //     },
+        // ));
+
+        // debug!(
+        //     "Interface called [RemoteDesktop.NotifyPointerMotion] {:#?}",
+        //     event
+        // );
+
+        // let (tx, _) = oneshot::channel::<zvariant::OwnedValue>();
+
+        // self.sender.send((event, tx));
     }
 
     pub fn notify_pointer_motion_absolute(
@@ -109,15 +148,24 @@ impl RemoteDesktopListener {
         x: f64,
         y: f64,
     ) {
-        let _ = self.sender.send(Event::RemoteDesktop(
-            RemoteDesktopEvent::NotifyPointerMotionAbsolute(NotifyPointerMotionAbsolute {
-                session_handle: session_handle.into_owned(),
-                options,
-                stream,
-                x,
-                y,
-            }),
-        ));
+        // let event = Event::RemoteDesktop(RemoteDesktopEvent::NotifyPointerMotionAbsolute(
+        //     NotifyPointerMotionAbsolute {
+        //         session_handle: session_handle.into_owned(),
+        //         options,
+        //         stream,
+        //         x,
+        //         y,
+        //     },
+        // ));
+
+        // debug!(
+        //     "Interface called [RemoteDesktop.NotifyPointerMotionAbsolute] {:#?}",
+        //     event
+        // );
+
+        // let (tx, _) = oneshot::channel::<zvariant::OwnedValue>();
+
+        // self.sender.send((event, tx));
     }
 
     pub fn notify_pointer_button(
@@ -127,14 +175,23 @@ impl RemoteDesktopListener {
         button: i32,
         state: u32,
     ) {
-        let _ = self.sender.send(Event::RemoteDesktop(
-            RemoteDesktopEvent::NotifyPointerButton(NotifyPointerButton {
-                session_handle: session_handle.into_owned(),
-                options,
-                button,
-                state,
-            }),
-        ));
+        // let event = Event::RemoteDesktop(RemoteDesktopEvent::NotifyPointerButton(
+        //     NotifyPointerButton {
+        //         session_handle: session_handle.into_owned(),
+        //         options,
+        //         button,
+        //         state,
+        //     },
+        // ));
+
+        // debug!(
+        //     "Interface called [RemoteDesktop.NotifyPointerButton] {:#?}",
+        //     event
+        // );
+
+        // let (tx, _) = oneshot::channel::<zvariant::OwnedValue>();
+
+        // self.sender.send((event, tx));
     }
 
     pub fn notify_pointer_axis(
@@ -144,16 +201,22 @@ impl RemoteDesktopListener {
         dx: f64,
         dy: f64,
     ) {
-        let _ = self
-            .sender
-            .send(Event::RemoteDesktop(RemoteDesktopEvent::NotifyPointerAxis(
-                NotifyPointerAxis {
-                    session_handle: session_handle.into_owned(),
-                    options,
-                    dx,
-                    dy,
-                },
-            )));
+        // let event =
+        //     Event::RemoteDesktop(RemoteDesktopEvent::NotifyPointerAxis(NotifyPointerAxis {
+        //         session_handle: session_handle.into_owned(),
+        //         options,
+        //         dx,
+        //         dy,
+        //     }));
+
+        // debug!(
+        //     "Interface called [RemoteDesktop.NotifyPointerAxis] {:#?}",
+        //     event
+        // );
+
+        // let (tx, _) = oneshot::channel::<zvariant::OwnedValue>();
+
+        // self.sender.send((event, tx));
     }
 
     pub fn notify_pointer_axis_discrete(
@@ -163,14 +226,23 @@ impl RemoteDesktopListener {
         axis: u32,
         steps: i32,
     ) {
-        let _ = self.sender.send(Event::RemoteDesktop(
-            RemoteDesktopEvent::NotifyPointerAxisDiscrete(NotifyPointerAxisDiscrete {
-                session_handle: session_handle.into_owned(),
-                options,
-                axis,
-                steps,
-            }),
-        ));
+        // let event = Event::RemoteDesktop(RemoteDesktopEvent::NotifyPointerAxisDiscrete(
+        //     NotifyPointerAxisDiscrete {
+        //         session_handle: session_handle.into_owned(),
+        //         options,
+        //         axis,
+        //         steps,
+        //     },
+        // ));
+
+        // debug!(
+        //     "Interface called [RemoteDesktop.NotifyPointerAxisDiscrete] {:#?}",
+        //     event
+        // );
+
+        // let (tx, _) = oneshot::channel::<zvariant::OwnedValue>();
+
+        // self.sender.send((event, tx));
     }
 
     pub fn notify_keyboard_keycode(
@@ -180,14 +252,23 @@ impl RemoteDesktopListener {
         keycode: i32,
         state: u32,
     ) {
-        let _ = self.sender.send(Event::RemoteDesktop(
-            RemoteDesktopEvent::NotifyKeyboardKeycode(NotifyKeyboardKeycode {
-                session_handle: session_handle.into_owned(),
-                options,
-                keycode,
-                state,
-            }),
-        ));
+        // let event = Event::RemoteDesktop(RemoteDesktopEvent::NotifyKeyboardKeycode(
+        //     NotifyKeyboardKeycode {
+        //         session_handle: session_handle.into_owned(),
+        //         options,
+        //         keycode,
+        //         state,
+        //     },
+        // ));
+
+        // debug!(
+        //     "Interface called [RemoteDesktop.NotifyKeyboardKeycode] {:#?}",
+        //     event
+        // );
+
+        // let (tx, _) = oneshot::channel::<zvariant::OwnedValue>();
+
+        // self.sender.send((event, tx));
     }
 
     pub fn notify_keyboard_keysym(
@@ -197,61 +278,64 @@ impl RemoteDesktopListener {
         keysym: i32,
         state: u32,
     ) {
-        let _ = self.sender.send(Event::RemoteDesktop(
-            RemoteDesktopEvent::NotifyKeyboardKeysym(NotifyKeyboardKeysym {
-                session_handle: session_handle.into_owned(),
-                options,
-                keysym,
-                state,
-            }),
-        ));
+        // let event = Event::RemoteDesktop(RemoteDesktopEvent::NotifyKeyboardKeysym(
+        //     NotifyKeyboardKeysym {
+        //         session_handle: session_handle.into_owned(),
+        //         options,
+        //         keysym,
+        //         state,
+        //     },
+        // ));
+
+        // debug!(
+        //     "Interface called [RemoteDesktop.NotifyKeyboardKeysym] {:#?}",
+        //     event
+        // );
+
+        // let (tx, _) = oneshot::channel::<zvariant::OwnedValue>();
+
+        // self.sender.send((event, tx));
     }
 
     /**
      * considered that no many devices need touch api
      * so if need we will add it later
      */
-    pub fn notify_touch_down(
-        &self,
-        session_handle: zvariant::ObjectPath<'_>,
-        options: HashMap<String, zvariant::OwnedValue>,
-        stream: u32,
-        slot: u32,
-        x: f64,
-        y: f64,
-    ) {
-        todo!()
-    }
 
-    pub fn notify_touch_motion(
-        &self,
-        session_handle: zvariant::ObjectPath<'_>,
-        options: HashMap<String, zvariant::OwnedValue>,
-        stream: u32,
-        slot: u32,
-        x: f64,
-        y: f64,
-    ) {
-        todo!()
-    }
+    #[zbus(property)]
+    async fn available_device_types(&self) -> zvariant::OwnedValue {
+        // let (tx, rx) = oneshot::channel::<zvariant::OwnedValue>();
 
-    pub fn notify_touch_up(
-        &self,
-        session_handle: zvariant::ObjectPath<'_>,
-        options: HashMap<String, zvariant::OwnedValue>,
-        slot: u32,
-    ) {
-        todo!()
+        // self.sender.send((
+        //     Event::RemoteDesktop(RemoteDesktopEvent::GetPropertiesAvilableDeviceTypes(
+        //         GetPropertiesAvilableDeviceTypes {},
+        //     )),
+        //     tx,
+        // ));
+
+        // match rx.await {
+        //     Ok(value) => value,
+        //     Err(_) => zvariant::OwnedValue::from(2),
+        // }
+        zvariant::OwnedValue::from(0)
     }
 
     #[zbus(property)]
-    pub fn available_device_types(&self) -> u32 {
-        3 // Keyboard (1) | Pointer (2) | Touchscreen (4)
-    }
+    async fn version(&self) -> zvariant::OwnedValue {
+        // let (tx, rx) = oneshot::channel::<zvariant::OwnedValue>();
 
-    #[zbus(property)]
-    pub fn version(&self) -> u32 {
-        1
+        // self.sender.send((
+        //     Event::RemoteDesktop(RemoteDesktopEvent::GetPropertiesVersion(
+        //         GetPropertiesVersion {},
+        //     )),
+        //     tx,
+        // ));
+
+        // match rx.await {
+        //     Ok(value) => value,
+        //     Err(_) => zvariant::OwnedValue::from(2),
+        // }
+        zvariant::OwnedValue::from(0)
     }
 }
 
@@ -260,8 +344,8 @@ impl Start for RemoteDesktopListener {
         debug!("Starting RemoteDesktopListener");
 
         let connection = Builder::session()?
-            .name("org.freedesktop.impl.portal.RemoteDesktop")?
-            .serve_at("/org/freedesktop/portal/RemoteDesktop", self)?
+            .name("org.freedesktop.impl.portal.desktop.bypass")?
+            .serve_at("/org/freedesktop/portal/desktop", self)?
             .build()
             .with_context(|| "Failed to start RemoteDesktopListener")?;
 

@@ -5,8 +5,13 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.100"
-calloop = { version = "0.14.3", features = ["signals"] }
+calloop = { version = "0.14.3", features = ["signals", "executor"] }
 evdev = "0.13.2"
+futures = "0.3.31"
+serde = "1.0.228"
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
 zbus = "5.12.0"
+
+[dev-dependencies]
+tokio = { version = "1.42", features = ["full"] }
